@@ -18,7 +18,7 @@ app.get('/cards', async (req: Request, res: Response) => {
   res.json(cards);
 })
 
-io.on('connection', (socket: socketio.Socket) => {
+io.on('create-card', (socket: socketio.Socket) => {
   socket.on('new-card', (card) => {
     console.log('Nouvelle carte créee :', );
   });
@@ -30,13 +30,7 @@ io.on('connection', (socket: socketio.Socket) => {
   });
 })
 
-// app.use("/api/cards", require("./routes/cardRoutes"));
-
 app.io = io;
-
-// app.get("/", (req: Request, res: Response) => {
-//   res.send('Hello TypeScript Express !');
-// });
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
