@@ -1,37 +1,21 @@
-import { Response } from "express";
-import * as socketio from 'socket.io';
-
-const express = require("express");
-const { PrismaClient } = require('@prisma/client');
-const socketIo = require("socket.io");
-
-const app = express();
-const server = require("http").Server(app);
-const port = process.env.PORT || 3001;
-const prisma = new PrismaClient();
-const io = socketIo(server);
-
-app.use(express.json());
-
-app.get('/cards', async (req: Request, res: Response) => {
-  const cards = await prisma.card.findMany();
-  res.json(cards);
+import * as socketio from "socket.io";
+const io = require("socket.io")(3001, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"]
+  }
 })
 
-io.on('create-card', (socket: socketio.Socket) => {
-  socket.on('new-card', (card) => {
-    console.log('Nouvelle carte créee :', );
-  });
-  socket.on('update-card', (card) => {
-    console.log(`La carte ${card} à été mise à jour`);
-  });
-  socket.on('delete-card', (card) => {
-    console.log(`La carte ${card } à été supprimé`  );
-  });
+io.on("connection", (socket : socketio.Server) => {
+  socket.on("card", (card) => {
+    io.emit("card", card);
+  })
+
+  socket.on("card:update", (card) => {
+    io.emit("card:update", card);
+  })
+
+  socket.on("card:delete", (card) => {
+    io.emit("card:delete", card);
+  })
 })
-
-app.io = io;
-
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
